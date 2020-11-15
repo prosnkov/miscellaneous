@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#Randomizer for learning words at ulpan
+import os 
+import subprocess
+import random
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QSizePolicy, QWidget, QPushButton, QFileDialog,QTextBrowser
+from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtGui import QIcon
+
+def iter_shuffled(l):
+    new_list = list(l)
+    random.shuffle(new_list)
+    for item in new_list:
+        yield item
+
+class Main_Window(QMainWindow):
+	def __init__(self,parent=None):
+		super(Main_Window,self).__init__(parent)
+		self.initUI1()
+		
+	def show_words(self):
+		global filepath
+		lines = open(str(filepath)).readlines()
+		i=0
+		while i<len(lines):
+			lines[i] = lines[i].replace('\n', '')
+			i=i+1
+		
+		new=list(lines)
+		random.shuffle(new)
+		self.text.setText("")
+		for i in range(len(new)):
+			self.text.append(str(new[i]))
+
+	def open_button_clk(self):
+		global filepath
+		filepath = QFileDialog.getOpenFileName(self, 'Открыть файл')[0]
+		lines = open(str(filepath)).readlines()
+		i=0
+		while i<len(lines):
+			lines[i] = lines[i].replace('\n', '')
+			i=i+1
+		self.text.setText("")
+		for i in range(len(lines)):
+			self.text.append(str(lines[i]))
+
+	def initUI1(self):
+		self.setWindowTitle('Learn Hebrew')
+		self.setGeometry(10, 10, 540, 480)
+
+		self.text = QTextBrowser()
+
+		open_button = QPushButton('Открыть файл', self); open_button.clicked.connect(self.open_button_clk)
+		show_button = QPushButton('Перемешать слова', self); show_button.clicked.connect(self.show_words)
+		bQuit = QPushButton('Выход', self); bQuit.clicked.connect(QCoreApplication.instance().quit)
+
+		layout = QGridLayout(self)
+		layout.addWidget(self.text,0,0,1,0)
+		layout.addWidget(open_button,1,0,1,0)
+		layout.addWidget(show_button,2,0,1,0)
+		layout.addWidget(bQuit,3,0,1,0)
+		Main_UI = QWidget()
+		Main_UI.setLayout(layout)
+		self.setCentralWidget(Main_UI)
+
+app = QApplication(sys.argv)
+ex = Main_Window()
+ex.show()
+sys.exit(app.exec_())
